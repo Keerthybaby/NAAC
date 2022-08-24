@@ -10,6 +10,11 @@ cd server
 python -m venv venv
 ```
 
+### Install all the dependencies
+```
+pip install -r requirements.txt
+```
+
 ### get into the virtual environment
 ```
 venv\Scripts\activate
