@@ -60,9 +60,13 @@
         </div>
 
         <div class="d-flex justify-content-between">
-            <button type="button" class="btn btn-outline-light"><a href="{% url 'login' %}">Login</a></button>
+            <form action="{% url 'login' %}">
+                <button type="submit" class="btn btn-outline-light">Login</button>
+            </form>
 
-            <button type="button" class="btn btn-outline-light"><a href="{% url 'signup' %}">SignUp</a></button>
+            <form action="{% url 'signup' %}">
+                <button type="submit" class="btn btn-outline-light">SignUp</button>
+            </form>
         </div>
 </div>
 {% endblock %}

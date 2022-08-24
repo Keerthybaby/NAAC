@@ -16,7 +16,7 @@ class IiqaForm(ModelForm):
     class Meta:
         model = Iiqa
         fields = "__all__"
-        exclude = ['user']
+        exclude = ['user', 'status']
 
 
 class SsrTextVerifyForm(ModelForm):

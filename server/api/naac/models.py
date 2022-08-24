@@ -46,9 +46,9 @@ class Iiqa(models.Model):
     head = models.CharField(max_length=100, null=True)
     designation = models.CharField(max_length=100, null=True)
     own_campus = models.BooleanField(choices=BOOL_CHOICES, default=False)
-    phn_no_clg = PhoneNumberField(null=False, blank=False, unique=True)
-    phn_no_principal = PhoneNumberField(null=False, blank=False, unique=True)
-    phn_no_principal_alt = PhoneNumberField(null=False, blank=False, unique=True)
+    phn_no_clg = PhoneNumberField(null=False, blank=False)
+    phn_no_principal = PhoneNumberField(null=False, blank=False)
+    phn_no_principal_alt = PhoneNumberField(null=False, blank=False)
     address = models.CharField(max_length=200, null=True)
     city = models.CharField(max_length=100, null=True)
     state = models.CharField(max_length=100, choices=STATE_CHOICES, default=1, null=True)
@@ -57,9 +57,10 @@ class Iiqa(models.Model):
     institution_type = models.CharField(max_length=100, null=True)
     location = models.CharField(max_length=100, null=True)
     financial_status = models.CharField(max_length=100, null=True)
+    status = models.BooleanField(default=False)
 
     def __str__(self):
-        return self.name
+        return str(self.user)
 
 
 class Ssr_Text_Converter(models.Model):
@@ -70,7 +71,7 @@ class Ssr_Text_Converter(models.Model):
     status = models.CharField(default='None', max_length=100, null=True)
 
     def __str__(self):
-        return self.clg_name
+        return str(self.user)
 
 
 class Ssr_Geo_Tag(models.Model):
@@ -81,3 +82,6 @@ class Ssr_Geo_Tag(models.Model):
     lat_convert = models.CharField(max_length=100, null=True)
     long_convert = models.CharField(max_length=100, null=True)
     status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.user)

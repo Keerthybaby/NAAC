@@ -2,12 +2,25 @@
 
 {% block content %}
 <div class="ml-5 mb-5">
-      <h1 class="mb-5 mt-3">IIQA</h1>
+    <h1 class="mb-5 mt-3">IIQA </h1>
+
+    {% for message in messages %}
+    <div class="alert alert-danger w-50" role="alert">
+        <p>{{message}}</p>
+    </div>
+    {% endfor %}
+
+    {% if not status %}
+
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit" class="btn btn-outline-primary">Submit</button>
     </form>
+
+    {% else %}
+    <div class="alert alert-success w-50" role="alert">Data submitted</div>
+    {% endif %}
 </div>
 
 

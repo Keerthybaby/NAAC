@@ -72,21 +72,27 @@ def dashBoard(request):
 
 @login_required(login_url='login')
 def iiqa(request):
-    # form = IiqaForm(initial={'user': request.user})
     form = IiqaForm()
-    # c = User.objects.get(id=pk)
+    try:
+        if request.user.iiqa:
+            status = request.user.iiqa.status
+    except:
+        status = False
     try:
         if request.method == 'POST':
             form = IiqaForm(request.POST)
             if form.is_valid():
                 form = form.save(commit=False)
                 form.user = request.user
+                # request.user.iiqa.status = True
+                form.status = True
                 form.save()
                 return redirect('ssrtxtverify')
     except Exception as e:
-        return HttpResponse(e)
+        messages.error(request, e)
+        return redirect('iiqa')
 
-    context = {'form': form, 'navbar': 'iiqa'}
+    context = {'form': form, 'navbar': 'iiqa', 'status': status}
 
     return render(request, 'naac/iiqa.html', context)
 
@@ -208,6 +214,7 @@ def ssrGeo(request):
                 form.save()
 
     except Exception as e:
+        Ssr_Geo_Tag.objects.filter(user=request.user).delete()
         messages.error(request, e)
         return redirect('ssrgeo')
 
