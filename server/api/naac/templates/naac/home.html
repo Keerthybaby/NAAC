@@ -1,0 +1,68 @@
+{% extends 'naac/main_template.html' %}
+{% load static %}
+{% block content %}
+<style>
+     body {
+          background:   linear-gradient(
+                        rgba(0, 0, 0, 0.5),
+                        rgba(0, 0, 0, 0.5)
+                      ),
+                      url({% static 'media/college.jpg' %}) no-repeat center center fixed;
+          -webkit-background-size: cover;
+          -moz-background-size: cover;
+          background-size: cover;
+          -o-background-size: cover;
+    }
+
+       .blur {
+            backdrop-filter: blur(15px);
+            color: white
+       }
+
+
+</style>
+<div class="container blur p-5 mt-5" >
+
+        <div>
+            <h1 class="d-flex justify-content-center align-items-center">Welcome to the NAAC website</h1>
+        </div>
+
+        <div class="mt-3">
+            <p>India has one of the largest and diverse education systems in the world. Privatization, widespread
+                expansion,
+                increased autonomy and introduction of Programmes in new and emerging areas have improved access to
+                higher
+                education. At the same time, it has also led to widespread concern on the quality and relevance of the
+                higher education. To address these concerns, the National Policy on Education (NPE, 1986) and the
+                Programme
+                of Action (PoA, 1992) spelt out strategic plans for the policies, advocated the establishment of an
+                independent National accreditation agency. Consequently, the National Assessment and Accreditation
+                Council
+                (NAAC) was established in 1994 as an autonomous institution of the University Grants Commission (UGC)
+                with
+                its Head Quarter in Bengaluru. The mandate of NAAC as reflected in its vision statement is in making
+                quality
+                assurance an integral part of the functioning of Higher Education Institutions (HEIs).</p>
+
+            <p>The NAAC functions through its General Council (GC) and Executive Committee (EC) comprising educational
+                administrators, policy makers and senior academicians from a cross-section of Indian higher education
+                system. The Chairperson of the UGC is the President of the GC of the NAAC, the Chairperson of the EC is
+                an
+                eminent academician nominated by the President of GC (NAAC). The Director is the academic and
+                administrative
+                head of NAAC and is the member-secretary of both the GC and the EC. In addition to the statutory bodies
+                that
+                steer its policies and core staff to support its activities NAAC is advised by the advisory and
+                consultative
+                committees constituted from time to time.</p>
+
+
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <button type="button" class="btn btn-outline-light"><a href="{% url 'login' %}">Login</a></button>
+
+            <button type="button" class="btn btn-outline-light"><a href="{% url 'signup' %}">SignUp</a></button>
+        </div>
+</div>
+{% endblock %}

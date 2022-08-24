@@ -1,0 +1,30 @@
+{% extends 'naac/navbar.html' %}
+
+{% block content %}
+
+<div class="ml-5 mb-5">
+    <h1 class="mb-5 mt-3">SSR Text Verification</h1>
+    {% if status == 'None' %}
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-outline-primary">Submit</button>
+        </form>
+
+        <br/>
+    {% else %}
+        {% if status == 'success' %}
+        <div class="alert alert-success w-50" role="alert">
+            <p>Data verification is successful</p>
+        </div>
+        {% endif %}
+    {% endif %}
+
+    {% for message in messages %}
+        <div class="alert alert-danger w-50" role="alert">
+            <p>{{message}}</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
