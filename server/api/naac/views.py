@@ -275,6 +275,7 @@ def ssrPlot(request, **kwargs):
     data_values = []
     data_header_2 = []
     data_values_2 = []
+    graph = None
     try:
         if request.user.ssr_plot:
             status = request.user.ssr_plot.status
@@ -308,22 +309,33 @@ def ssrPlot(request, **kwargs):
             json_records_2 = df_2.reset_index().to_json(orient='records')
             data_2 = json.loads(json_records_2)
             data_header_2 = list(data_2[0].keys())
-            print("kggggggggggggggggggggggggggggggggg")
+            print(data_header_2)
             for i in data_2:
                 data_values_2.append(list(i.values()))
 
             output_columns = [data_header[3], data_header[4]]
             if request.POST['select_box'] == 'pgm_name':
+                groupby_column = data_header_2[1]
                 df_grouped_2 = df_2.groupby(by=[data_header[1]], as_index=False)[output_columns].sum()
-                print(df_grouped_2)
             elif request.POST['select_box'] == 'pgm_code':
+                groupby_column = data_header_2[2]
                 df_grouped_2 = df_2.groupby(by=[data_header[2]], as_index=False)[output_columns].sum()
 
+            fig = px.bar(
+                df_grouped_2,
+                x=groupby_column,
+                y=data_header_2[3],
+                color=data_header_2[4],
+                color_continuous_scale=['red', 'yellow', 'green'],
+                template='plotly_white',
+                title=f'<b>Number of seats sanctioned &Number of Students admitted by{groupby_column}</b>'
+            )
 
+            graph = fig.to_html(full_html=False, default_height=950, default_width=950)
 
     except:
         status = False
 
     context = {'navbar': 'ssrplot', 'form': form, 'data_header': data_header,
-               'data_values': data_values, 'status': status}
+               'data_values': data_values, 'status': status, 'graph': graph}
     return render(request, 'naac/ssr_plot.html', context)

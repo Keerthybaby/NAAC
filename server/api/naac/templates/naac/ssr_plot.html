@@ -12,9 +12,9 @@
         {{ form.as_p }}
         <button type="submit" class="btn btn-outline-primary">Submit</button>
     </form>
-    {% endif %}
 
-    <div class="container-fluid">
+    {% else %}
+    <div class="container" style="height: 10%">
         <h3 class=""><u>Excel Data Table</u></h3><br>
         <table class="table table-dark table-striped">
             <thead>
@@ -43,7 +43,7 @@
         </table>
     </div>
 
-    <div class="container-fluid">
+    <div class="container">
         <h3 class="mt-5">What would you like to analyse?</h3>
         <form class="mt-5" method="post" enctype="multipart/form-data">
             {% csrf_token %}
@@ -54,7 +54,14 @@
             </select>
             <button type="submit" class="btn btn-outline-primary">Submit</button>
         </form>
+        {% if graph %}
+        {{ graph|safe }}
+
+        {% endif %}
+
+        {% endif %}
     </div>
+
 
     {% for message in messages %}
     <div class="alert alert-danger w-50" role="alert">
