@@ -1,5 +1,6 @@
 import os
 from time import sleep
+import json
 
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, FileResponse
@@ -10,9 +11,11 @@ from django.contrib.auth.decorators import login_required
 from .decorators import unauthenticated_user
 
 from .models import *
-from .forms import CreateUserForm, IiqaForm, SsrTextVerifyForm, SsrGeoForm
+from .forms import CreateUserForm, IiqaForm, SsrTextVerifyForm, SsrGeoForm, SsrPlotForm
 import PyPDF2
 from exif import Image
+import pandas as pd
+import plotly.express as px
 
 
 # Create your views here.
@@ -103,7 +106,7 @@ def textpdfConvert(filename):
 
     # creating a pdf reader object
     pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
-
+    txt_extracted = []
     # printing number of pages in pdf file
     print(pdfReader.numPages)
     # creating a page object
@@ -111,17 +114,18 @@ def textpdfConvert(filename):
         pageObj = pdfReader.getPage(page)
 
         # extracting text from page
-        txt_extracted = pageObj.extractText()
-
+        txt_extracted.append(pageObj.extractText())
     # closing the pdf file object
 
-    txt_extracted = txt_extracted.split("\n")
+    txt_extracted = txt_extracted[0].split("\n")
     return txt_extracted, pdfFileObj
 
 
 @login_required(login_url='login')
 def ssrTextVerify(request):
     form = SsrTextVerifyForm()
+    progress_bar = 0
+
     try:
         if request.user.ssr_text_converter:
             status = request.user.ssr_text_converter.status
@@ -137,22 +141,48 @@ def ssrTextVerify(request):
                 filename = request.user.ssr_text_converter.pdf
 
                 txt_extracted, pdfFileObj = textpdfConvert(filename)
+                progress_bar = 0
+                if request.user.ssr_text_converter.college_name not in txt_extracted:
+                    messages.error(request, "College Name doesn't match with the given PDF")
+                else:
+                    messages.success(request, "College Name matches with the given PDF")
+                    progress_bar += 25
 
-                if (request.user.ssr_text_converter.clg_name in txt_extracted) and (
-                        request.user.ssr_text_converter.uni_name) in txt_extracted:
+                if request.user.ssr_text_converter.university_name not in txt_extracted:
+                    messages.error(request, "University Name doesn't match with the given PDF")
+                else:
+                    messages.success(request, "University Name matches with the given PDF")
+                    progress_bar += 25
+
+                if request.user.ssr_text_converter.courses_offered not in txt_extracted:
+                    messages.error(request, "Courses offered doesn't match with the given PDF")
+                else:
+                    messages.success(request, "Courses offered matches with the given PDF")
+                    progress_bar += 25
+
+                if request.user.ssr_text_converter.total_no_of_students not in txt_extracted:
+                    messages.error(request, "Total number of students doesn't match with the given PDF")
+                else:
+                    messages.success(request, "Total number of students matches with the given PDF")
+                    progress_bar += 25
+
+                if (request.user.ssr_text_converter.college_name in txt_extracted) and \
+                        (request.user.ssr_text_converter.university_name in txt_extracted) and \
+                        (request.user.ssr_text_converter.courses_offered in txt_extracted) and \
+                        (request.user.ssr_text_converter.total_no_of_students in txt_extracted):
                     form.status = 'success'
                     form.save()
                     pdfFileObj.close()
-                    return redirect('ssrtxtverify')
+                    return redirect('ssrtxtverify', pb=10)
                 else:
-                    messages.error(request, "Data does not match")
-                    return redirect('ssrtxtverify')
+                    messages.error(request, "Data verification Failed. Enter the data correctly")
+                    return redirect('ssrtxtverify', pb=20)
 
     except Exception as e:
         messages.error(request, e)
         return redirect('ssrtxtverify')
 
-    context = {'navbar': 'ssrtxtverify', 'form': form, 'status': status}
+    context = {'navbar': 'ssrtxtverify', 'form': form, 'status': status, 'progress_bar': progress_bar}
     return render(request, 'naac/ssr_txt_verify.html', context)
 
 
@@ -234,3 +264,59 @@ def ssrGeo(request):
                    'status': status}
 
     return render(request, 'naac/ssr_geo.html', context)
+
+
+@login_required(login_url='login')
+def ssrPlot(request, **kwargs):
+    form = SsrPlotForm()
+    data_header = []
+    data_values = []
+    try:
+        if request.user.ssr_plot:
+            status = request.user.ssr_plot.status
+    except:
+        status = False
+
+    try:
+        if request.method == 'POST':
+
+            if not status:
+                form = SsrPlotForm(request.POST, request.FILES)
+                if form.is_valid():
+                    form = form.save(commit=False)
+                    form.status = True
+                    form.user = request.user
+                    form = form.save()
+                    filename = request.user.ssr_plot.excel
+                    df = pd.read_excel(filename, engine='openpyxl', header=1)
+                    json_records = df.reset_index().to_json(orient='records')
+                    data = json.loads(json_records)
+                    data_header = list(data[0].keys())
+
+                    for i in data:
+                        data_values.append(list(i.values()))
+
+        if 'select_box' in request.POST:
+            filename = request.user.ssr_plot.excel
+            df = pd.read_excel(filename, engine='openpyxl', header=1)
+            json_records = df.reset_index().to_json(orient='records')
+            data = json.loads(json_records)
+            data_header = list(data[0].keys())
+
+            for i in data:
+                data_values.append(list(i.values()))
+
+            output_columns = [data_header[3], data_header[4]]
+            if request.POST['select_box'] == 'pgm_name':
+                df_grouped = df.groupby(by=[data_header[1]], as_index=False)[output_columns].sum()
+                print(df_grouped)
+            elif request.POST['select_box'] == 'pgm_code':
+                df_grouped = df.groupby(by=[data_header[2]], as_index=False)[output_columns].sum()
+
+
+    except:
+        status = False
+
+    context = {'navbar': 'ssrplot', 'form': form, 'data_header': data_header,
+               'data_values': data_values}
+    return render(request, 'naac/ssr_plot.html', context)

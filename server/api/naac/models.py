@@ -65,9 +65,12 @@ class Iiqa(models.Model):
 
 class Ssr_Text_Converter(models.Model):
     user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
-    clg_name = models.CharField(max_length=100, null=True)
-    uni_name = models.CharField(max_length=100, null=True)
+    college_name = models.CharField(max_length=100, null=True)
+    university_name = models.CharField(max_length=100, null=True)
+    courses_offered = models.IntegerField(null=True)
+    total_no_of_students = models.IntegerField(null=True)
     pdf = models.FileField(null=True, blank=True)
+    progress_bar = models.IntegerField(default=0, null=True)
     status = models.CharField(default='None', max_length=100, null=True)
 
     def __str__(self):
@@ -81,6 +84,15 @@ class Ssr_Geo_Tag(models.Model):
     longitude = models.CharField(max_length=100, null=True)
     lat_convert = models.CharField(max_length=100, null=True)
     long_convert = models.CharField(max_length=100, null=True)
+    status = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.user)
+
+
+class Ssr_Plot(models.Model):
+    user = models.OneToOneField(User, null=True, on_delete=models.CASCADE)
+    excel = models.FileField(null=True, blank=True)
     status = models.BooleanField(default=False)
 
     def __str__(self):

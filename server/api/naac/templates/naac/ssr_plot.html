@@ -1,0 +1,67 @@
+{% extends 'naac/navbar.html' %}
+{% load static %}
+{% block content %}
+
+
+<div class="ml-5 mb-5">
+    <h1 class="mb-5 mt-3">Plot Comparison</h1>
+
+    {% if not status %}
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-outline-primary">Submit</button>
+    </form>
+    {% endif %}
+
+    <div class="container">
+        <h2 class="text-center"><u>Excel Data Table</u></h2><br>
+        <table class="table table-dark table-striped">
+            <thead>
+            <tr>
+                {% if data_header %}
+                {% for i in data_header %}
+                <th class="text-center">{{i}}</th>
+                {% endfor %}
+                {% endif %}
+            </tr>
+            </thead>
+
+            <tbody>
+            <!-- jinja2 Technique -->
+            {% if data_values %}
+            {% for i in data_values %}
+            <tr>
+                {% for j in i %}
+                <td class="text-center">{{j}}</td>
+                {% endfor %}
+            </tr>
+
+            {% endfor %}
+            {% endif %}
+            </tbody>
+        </table>
+    </div>
+
+    <div>
+        <h2>What would you like to analyse?</h2>
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <select class="form-select" aria-label="Default select example" name="select_box">
+                <option selected>--------------------</option>
+                <option value="pgm_name">Programme Name</option>
+                <option value="pgm_code">Programme Code</option>
+            </select>
+            <button type="submit" class="btn btn-outline-primary">Submit</button>
+        </form>
+    </div>
+
+    {% for message in messages %}
+    <div class="alert alert-danger w-50" role="alert">
+        <p>{{message}}</p>
+    </div>
+    {% endfor %}
+</div>
+
+
+{% endblock %}

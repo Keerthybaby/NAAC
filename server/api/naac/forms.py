@@ -23,7 +23,7 @@ class SsrTextVerifyForm(ModelForm):
     class Meta:
         model = Ssr_Text_Converter
         fields = "__all__"
-        exclude = ['user', 'status']
+        exclude = ['user', 'status', 'progress_bar']
 
 
 class SsrGeoForm(ModelForm):
@@ -33,3 +33,10 @@ class SsrGeoForm(ModelForm):
         exclude = ['user', 'status', 'latitude',
                    'longitude', 'lat_convert',
                    'long_convert']
+
+
+class SsrPlotForm(ModelForm):
+    class Meta:
+        model = Ssr_Plot
+        fields = "__all__"
+        exclude = ['user', 'status']

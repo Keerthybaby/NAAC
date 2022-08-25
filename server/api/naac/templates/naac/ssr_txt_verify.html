@@ -5,26 +5,41 @@
 <div class="ml-5 mb-5">
     <h1 class="mb-5 mt-3">SSR Text Verification</h1>
     {% if status == 'None' %}
-        <form method="post" enctype="multipart/form-data">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-outline-primary">Submit</button>
-        </form>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-outline-primary">Submit</button>
+    </form>
 
-        <br/>
-    {% else %}
-        {% if status == 'success' %}
-        <div class="alert alert-success w-50" role="alert">
-            <p>Data verification is successful</p>
-        </div>
-        {% endif %}
+    <br/>
     {% endif %}
 
     {% for message in messages %}
-        <div class="alert alert-danger w-50" role="alert">
-            <p>{{message}}</p>
-        </div>
+    {% if message.tags == 'success' %}
+    <div class="alert alert-primary w-50" role="alert">
+        <p>{{message}}</p>
+    </div>
+    {% else %}
+    <div class="alert alert-danger w-50" role="alert">
+        <p>{{message}}</p>
+    </div>
+    {% endif %}
     {% endfor %}
+
+    <br />
+    <h3>Progress</h3>
+    <div class="progress" style="width: 90%">
+        <div class="progress-bar progress-bar-striped bg-info progress-bar-animated" role="progressbar" aria-valuenow="75"
+             aria-valuemin="0" aria-valuemax="100" style="width: {{progress_bar}}%">{{progress_bar}}%</div>
+    </div>
+
+    {% if status == 'success' %}
+    <div class="alert alert-success w-50" role="alert">
+        <p>Data verification is successful</p>
+    </div>
+    {% endif %}
+
+
 </div>
 {% endblock %}
 
