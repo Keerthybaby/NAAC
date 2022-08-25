@@ -273,6 +273,8 @@ def ssrPlot(request, **kwargs):
     form = SsrPlotForm()
     data_header = []
     data_values = []
+    data_header_2 = []
+    data_values_2 = []
     try:
         if request.user.ssr_plot:
             status = request.user.ssr_plot.status
@@ -291,23 +293,6 @@ def ssrPlot(request, **kwargs):
                     form = form.save()
                     return redirect('ssrplot')
 
-        if 'select_box' in request.POST:
-            filename = request.user.ssr_plot.excel
-            df = pd.read_excel(filename, engine='openpyxl', header=1)
-            json_records = df.reset_index().to_json(orient='records')
-            data = json.loads(json_records)
-            data_header = list(data[0].keys())
-
-            for i in data:
-                data_values.append(list(i.values()))
-
-            output_columns = [data_header[3], data_header[4]]
-            if request.POST['select_box'] == 'pgm_name':
-                df_grouped = df.groupby(by=[data_header[1]], as_index=False)[output_columns].sum()
-                print(df_grouped)
-            elif request.POST['select_box'] == 'pgm_code':
-                df_grouped = df.groupby(by=[data_header[2]], as_index=False)[output_columns].sum()
-
         filename = request.user.ssr_plot.excel
         df = pd.read_excel(filename, engine='openpyxl', header=1)
         json_records = df.reset_index().to_json(orient='records')
@@ -316,6 +301,25 @@ def ssrPlot(request, **kwargs):
 
         for i in data:
             data_values.append(list(i.values()))
+
+        if 'select_box' in request.POST:
+            filename_2 = request.user.ssr_plot.excel
+            df_2 = pd.read_excel(filename_2, engine='openpyxl', header=1)
+            json_records_2 = df_2.reset_index().to_json(orient='records')
+            data_2 = json.loads(json_records_2)
+            data_header_2 = list(data_2[0].keys())
+            print("kggggggggggggggggggggggggggggggggg")
+            for i in data_2:
+                data_values_2.append(list(i.values()))
+
+            output_columns = [data_header[3], data_header[4]]
+            if request.POST['select_box'] == 'pgm_name':
+                df_grouped_2 = df_2.groupby(by=[data_header[1]], as_index=False)[output_columns].sum()
+                print(df_grouped_2)
+            elif request.POST['select_box'] == 'pgm_code':
+                df_grouped_2 = df_2.groupby(by=[data_header[2]], as_index=False)[output_columns].sum()
+
+
 
     except:
         status = False
