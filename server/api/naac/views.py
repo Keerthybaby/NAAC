@@ -124,7 +124,6 @@ def textpdfConvert(filename):
 @login_required(login_url='login')
 def ssrTextVerify(request):
     form = SsrTextVerifyForm()
-    progress_bar = 0
 
     try:
         if request.user.ssr_text_converter:
@@ -142,6 +141,7 @@ def ssrTextVerify(request):
 
                 txt_extracted, pdfFileObj = textpdfConvert(filename)
                 progress_bar = 0
+
                 if request.user.ssr_text_converter.college_name not in txt_extracted:
                     messages.error(request, "College Name doesn't match with the given PDF")
                 else:
@@ -166,6 +166,8 @@ def ssrTextVerify(request):
                     messages.success(request, "Total number of students matches with the given PDF")
                     progress_bar += 25
 
+                messages.info(request, progress_bar)
+
                 if (request.user.ssr_text_converter.college_name in txt_extracted) and \
                         (request.user.ssr_text_converter.university_name in txt_extracted) and \
                         (request.user.ssr_text_converter.courses_offered in txt_extracted) and \
@@ -173,16 +175,16 @@ def ssrTextVerify(request):
                     form.status = 'success'
                     form.save()
                     pdfFileObj.close()
-                    return redirect('ssrtxtverify', pb=10)
+                    return redirect('ssrtxtverify')
                 else:
                     messages.error(request, "Data verification Failed. Enter the data correctly")
-                    return redirect('ssrtxtverify', pb=20)
+                    return redirect('ssrtxtverify')
 
     except Exception as e:
         messages.error(request, e)
         return redirect('ssrtxtverify')
 
-    context = {'navbar': 'ssrtxtverify', 'form': form, 'status': status, 'progress_bar': progress_bar}
+    context = {'navbar': 'ssrtxtverify', 'form': form, 'status': status}
     return render(request, 'naac/ssr_txt_verify.html', context)
 
 
@@ -287,14 +289,7 @@ def ssrPlot(request, **kwargs):
                     form.status = True
                     form.user = request.user
                     form = form.save()
-                    filename = request.user.ssr_plot.excel
-                    df = pd.read_excel(filename, engine='openpyxl', header=1)
-                    json_records = df.reset_index().to_json(orient='records')
-                    data = json.loads(json_records)
-                    data_header = list(data[0].keys())
-
-                    for i in data:
-                        data_values.append(list(i.values()))
+                    return redirect('ssrplot')
 
         if 'select_box' in request.POST:
             filename = request.user.ssr_plot.excel
@@ -313,10 +308,18 @@ def ssrPlot(request, **kwargs):
             elif request.POST['select_box'] == 'pgm_code':
                 df_grouped = df.groupby(by=[data_header[2]], as_index=False)[output_columns].sum()
 
+        filename = request.user.ssr_plot.excel
+        df = pd.read_excel(filename, engine='openpyxl', header=1)
+        json_records = df.reset_index().to_json(orient='records')
+        data = json.loads(json_records)
+        data_header = list(data[0].keys())
+
+        for i in data:
+            data_values.append(list(i.values()))
 
     except:
         status = False
 
     context = {'navbar': 'ssrplot', 'form': form, 'data_header': data_header,
-               'data_values': data_values}
+               'data_values': data_values, 'status': status}
     return render(request, 'naac/ssr_plot.html', context)

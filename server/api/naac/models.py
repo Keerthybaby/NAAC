@@ -70,7 +70,6 @@ class Ssr_Text_Converter(models.Model):
     courses_offered = models.IntegerField(null=True)
     total_no_of_students = models.IntegerField(null=True)
     pdf = models.FileField(null=True, blank=True)
-    progress_bar = models.IntegerField(default=0, null=True)
     status = models.CharField(default='None', max_length=100, null=True)
 
     def __str__(self):
