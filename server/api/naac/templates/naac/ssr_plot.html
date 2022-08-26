@@ -54,11 +54,22 @@
             </select>
             <button type="submit" class="btn btn-outline-primary">Submit</button>
         </form>
+
         {% if graph %}
         {{ graph|safe }}
-
         {% endif %}
 
+        {% if my_bar %}
+        <h3 class="mt-5">Percent of data mapped and processed</h3>
+        <br/>
+        <div class="progress">
+            <div class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: {{my_bar}}%"
+                 aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">{{my_bar}}%
+            </div>
+        </div>
+        <br/>
+        <p class="text-success">{{my_bar}}% data mapped.</p>
+        {% endif %}
         {% endif %}
     </div>
 

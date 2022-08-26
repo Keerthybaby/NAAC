@@ -15,6 +15,7 @@ from .forms import CreateUserForm, IiqaForm, SsrTextVerifyForm, SsrGeoForm, SsrP
 import PyPDF2
 from exif import Image
 import pandas as pd
+import numpy as np
 import plotly.express as px
 
 
@@ -276,6 +277,8 @@ def ssrPlot(request, **kwargs):
     data_header_2 = []
     data_values_2 = []
     graph = None
+    my_bar = 0
+
     try:
         if request.user.ssr_plot:
             status = request.user.ssr_plot.status
@@ -309,7 +312,7 @@ def ssrPlot(request, **kwargs):
             json_records_2 = df_2.reset_index().to_json(orient='records')
             data_2 = json.loads(json_records_2)
             data_header_2 = list(data_2[0].keys())
-            print(data_header_2)
+
             for i in data_2:
                 data_values_2.append(list(i.values()))
 
@@ -317,9 +320,11 @@ def ssrPlot(request, **kwargs):
             if request.POST['select_box'] == 'pgm_name':
                 groupby_column = data_header_2[1]
                 df_grouped_2 = df_2.groupby(by=[data_header[1]], as_index=False)[output_columns].sum()
+                df_grouped_2.drop(df.tail(1).index,inplace=True)
             elif request.POST['select_box'] == 'pgm_code':
                 groupby_column = data_header_2[2]
                 df_grouped_2 = df_2.groupby(by=[data_header[2]], as_index=False)[output_columns].sum()
+
 
             fig = px.bar(
                 df_grouped_2,
@@ -333,9 +338,22 @@ def ssrPlot(request, **kwargs):
 
             graph = fig.to_html(full_html=False, default_height=950, default_width=950)
 
+            # keywords
+            courseList = df_grouped_2[groupby_column]
+
+            total = len(courseList)
+            print(total)
+
+            #How many total programs have their seats filled
+            seats_filled = df_grouped_2[df_grouped_2[data_header_2[3]] == df_grouped_2[data_header_2[4]]].count()
+            print(seats_filled[1])
+
+            my_bar = round((seats_filled[2]/total) * 100, 2)
+            print(my_bar)
+
     except:
-        status = False
+        status = True
 
     context = {'navbar': 'ssrplot', 'form': form, 'data_header': data_header,
-               'data_values': data_values, 'status': status, 'graph': graph}
+               'data_values': data_values, 'status': status, 'graph': graph, 'my_bar': my_bar}
     return render(request, 'naac/ssr_plot.html', context)
