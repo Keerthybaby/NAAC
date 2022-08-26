@@ -141,6 +141,19 @@ def ssrTextVerify(request):
                 filename = request.user.ssr_text_converter.pdf
 
                 txt_extracted, pdfFileObj = textpdfConvert(filename)
+                txt_extracted = list(map(lambda x: x.strip(' '), txt_extracted))
+                while "" in txt_extracted:
+                    txt_extracted.remove("")
+
+                txt_extracted_numbers = []
+                for item in txt_extracted:
+                    for subitem in item.split():
+                        if (subitem.isdigit()):
+                            txt_extracted_numbers.append(int(subitem))
+
+                txt_extracted += txt_extracted_numbers
+                print(txt_extracted)
+
                 progress_bar = 0
 
                 if request.user.ssr_text_converter.college_name not in txt_extracted:
@@ -352,7 +365,7 @@ def ssrPlot(request, **kwargs):
             print(my_bar)
 
     except:
-        status = True
+        status = False
 
     context = {'navbar': 'ssrplot', 'form': form, 'data_header': data_header,
                'data_values': data_values, 'status': status, 'graph': graph, 'my_bar': my_bar}
