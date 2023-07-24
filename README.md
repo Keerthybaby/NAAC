@@ -1,6 +1,8 @@
 # NAAC
 This repo contains a web-application made using Django.
 
+# Run the application
+
 ### change directory to server
 ```
 cd server
