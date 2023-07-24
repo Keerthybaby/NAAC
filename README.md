@@ -1,4 +1,5 @@
 # NAAC
+This repo contains a web-application made using Django.
 
 ### change directory to server
 ```
